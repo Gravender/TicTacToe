@@ -13,7 +13,20 @@ h1 {
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-size: 55px;
 }
-
+.gameBoard{
+    display: grid;
+    position: absolute;
+    text-align:center;
+    font-size: 90px;
+    left: 50%;
+    top: 300px;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 300px;
+    grid-template-rows: repeat(3, 100px);
+    grid-template-columns: repeat(3, 100px);
+    justify-content: stretch;
+}
 a{
     background-color: #DFBFDF;
     color:rgb(77, 77, 77);
