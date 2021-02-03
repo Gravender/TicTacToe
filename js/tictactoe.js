@@ -9,8 +9,18 @@ const gameBoard = (() =>{
     const getBoard = (x) => board[x];
     const setBoard = (x, value) => board[x] = value;
     const reset = () => board = new Array(9);
-
-    return {getBoard, setBoard, reset};
+    const playerAddMarks = (x) =>{
+       return function (){
+        if(getBoard(x) != 'X' && getBoard(x) != 'O'){
+            setBoard(x, 'X');
+            displayController.update();
+        }
+        else{
+            console.log("Invalid Location");
+        }
+       };
+    };
+    return {getBoard, setBoard, reset, playerAddMarks};
 })();
 const displayController = (() =>{
     const board = document.getElementById('gameBoard');
@@ -25,7 +35,7 @@ const displayController = (() =>{
                 cell.innerText = gameBoard.getBoard(i);
             }
             cell.setAttribute('id', `${i}}`);
-            /* cell.addEventListener('click', gameBoard.move(i)); */
+            cell.addEventListener('click', gameBoard.playerAddMarks(i));
             board.appendChild(cell).className = "grid-item";
         }
     }
