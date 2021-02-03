@@ -14,7 +14,7 @@ h1 {
     font-size: 55px;
 }
 .gameBoard{
-    display: grid;
+    display: none;
     position: absolute;
     text-align:center;
     font-size: 90px;
@@ -27,11 +27,11 @@ h1 {
     grid-template-columns: repeat(3, 100px);
     justify-content: stretch;
 }
-.displayWinner{
+.gameOver{
     display: none;
+}
+.displayWinner{
     position: absolute;
-    font-size: 45px;
-    font-weight: 700;
     left: 50%;
     top: 125px;
     transform: translate(-50%, -50%);

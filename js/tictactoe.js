@@ -6,20 +6,19 @@ const player = (name, piece) =>{
 }
 const gameBoard = (() =>{
     let board = new Array(9);
-    let player1, player2;
+    let player1, player2, flop;
     const getBoard = (x) => board[x];
     const setBoard = (x, value) => board[x] = value;
     const reset = () => board = new Array(9);
-    let flop = true;
     const playerAddMarks = (x) =>{
        return function (){
         gamestate = gameOver();
         if(getBoard(x) != 'X' && getBoard(x) != 'O' && gamestate == ''){
             if(flop){
-                setBoard(x, 'X');
+                setBoard(x, player1.getPiece());
             }
             else{
-                setBoard(x, 'O');
+                setBoard(x, player2.getPiece());
             }
             flop = !flop;
             displayController.update();
@@ -86,7 +85,8 @@ const gameBoard = (() =>{
         }
         //check if tie
         if(valid == 3){
-            return `${current} Won!`;
+            if(player1.getPiece() == current) return `${player1.getName()} Won!`;
+            else return `${player2.getName()} Won!`;
         }
         else{
             for (let i = 0; i < 9; i++) {
@@ -100,12 +100,14 @@ const gameBoard = (() =>{
     const createPlayers = (name1, piece1, name2, piece2) => {
         player1 = player(name1, piece1);
         player2 = player(name2, piece2);
+        flop = true;
     }
-    return {getBoard, setBoard, reset, playerAddMarks, gameOver};
+    return {getBoard, setBoard, reset, playerAddMarks, gameOver, createPlayers};
 })();
 const displayController = (() =>{
     const board = document.getElementById('gameBoard');
     const update = () =>{
+        board.style.display = 'grid';
         while (board.firstChild) {
             board.removeChild(board.lastChild);
         }
@@ -121,11 +123,32 @@ const displayController = (() =>{
         }
     }
     const showWinner = (x) =>{
+        const gameOver = document.getElementById("gameOver");
         const displayWinner = document.getElementById("displayWinner");
-        displayWinner.style.display = 'block';
+        gameOver.style.display = 'block';
         displayWinner.innerText = x;
     }
-    return{update, showWinner};
+    const reset = () =>{
+        gameBoard.reset();
+        board.style.display = 'none';
+        const gameOver = document.getElementById("gameOver");
+        const displayWinner = document.getElementById("displayWinner");
+        const startDiv = document.getElementById("start");
+        gameOver.style.display = 'none';
+        displayWinner.innerText = '';
+        startDiv.style.display = 'block';
+    };
+    const start = () =>{
+        const player1 = document.getElementById("player1");
+        const player2 = document.getElementById("player2");
+        const startDiv = document.getElementById("start");
+        gameBoard.createPlayers(player1.value, 'X', player2.value, "O");
+        startDiv.style.display = 'none';
+        update();
+    }
+    const resetBtn = document.getElementById('resetBtn');
+    const startBtn = document.getElementById('startBtn');
+    resetBtn.addEventListener('click',reset);
+    startBtn.addEventListener('click',start);
+    return{update, showWinner, reset};
 })();
-
-displayController.update();

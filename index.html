@@ -9,8 +9,16 @@
 </head>
 <body>
   <h1>Tic Tac Toe</h1>
+  <div class = 'start' id= 'start'>
+    <p><label for="player1">Player 1 Name:</label><input class = 'playerInput' id="player1" type="text" placeholder="Enter a name?"></p>
+    <p><label for="player2">Player 2 Name:</label><input class = 'playerInput' id="player2" type="text" placeholder="Enter a name?"></p>
+    <button id= 'startBtn' >StartGame</button>
+  </div>
   <div class = 'gameBoard' id ='gameBoard'></div>
-  <div class = 'displayWinner' id = 'displayWinner'></div>
+  <div class = 'gameOver' id = 'gameOver'>
+    <h3 class = 'displayWinner' id = 'displayWinner'></h3>
+    <button id= 'resetBtn' >Reset</button>
+  </div>
   <script type="text/javascript" src="js/tictactoe.js"></script>
   <footer>Made by: <a href=https://github.com/Gravender> Gravender</a></footer>
 </body>
