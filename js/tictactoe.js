@@ -1,18 +1,20 @@
 
 const player = (name, piece) =>{
     const getPiece = () => piece;
-
-    return {getPiece};
+    const getName = () => name;
+    return {getPiece, getName};
 }
 const gameBoard = (() =>{
     let board = new Array(9);
+    let player1, player2;
     const getBoard = (x) => board[x];
     const setBoard = (x, value) => board[x] = value;
     const reset = () => board = new Array(9);
     let flop = true;
     const playerAddMarks = (x) =>{
        return function (){
-        if(getBoard(x) != 'X' && getBoard(x) != 'O' && !gameOver()){
+        gamestate = gameOver();
+        if(getBoard(x) != 'X' && getBoard(x) != 'O' && gamestate == ''){
             if(flop){
                 setBoard(x, 'X');
             }
@@ -21,14 +23,15 @@ const gameBoard = (() =>{
             }
             flop = !flop;
             displayController.update();
-            gameOver();
+            gamestate = gameOver();
+            if(gamestate != ''){
+                displayController.showWinner(gamestate);
+            }
         }
-        else if(gameOver()){
-            console.log("Winner already Delcared");
-        }
-        else{
-            console.log("Invalid Location");
-        }
+        else if(gamestate == ''){
+                console.log("Invalid Location");
+            }
+        else console.log('Winner already declared');
        };
     };
     const gameOver = () => {
@@ -83,19 +86,21 @@ const gameBoard = (() =>{
         }
         //check if tie
         if(valid == 3){
-            console.log(`Winner ${current}`);
-            return true;
+            return `${current} Won!`;
         }
         else{
             for (let i = 0; i < 9; i++) {
                 if(getBoard(i) != "X" && getBoard(i) != "O"){
-                    return false;
+                    return '';
                 }
             }
-            console.log("tied");
-            return true;
+            return "You Tied!";
         }
     };
+    const createPlayers = (name1, piece1, name2, piece2) => {
+        player1 = player(name1, piece1);
+        player2 = player(name2, piece2);
+    }
     return {getBoard, setBoard, reset, playerAddMarks, gameOver};
 })();
 const displayController = (() =>{
@@ -115,7 +120,12 @@ const displayController = (() =>{
             board.appendChild(cell).className = "grid-item";
         }
     }
-    return{update};
+    const showWinner = (x) =>{
+        const displayWinner = document.getElementById("displayWinner");
+        displayWinner.style.display = 'block';
+        displayWinner.innerText = x;
+    }
+    return{update, showWinner};
 })();
 
 displayController.update();
