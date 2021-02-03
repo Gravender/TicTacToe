@@ -9,18 +9,94 @@ const gameBoard = (() =>{
     const getBoard = (x) => board[x];
     const setBoard = (x, value) => board[x] = value;
     const reset = () => board = new Array(9);
+    let flop = true;
     const playerAddMarks = (x) =>{
        return function (){
-        if(getBoard(x) != 'X' && getBoard(x) != 'O'){
-            setBoard(x, 'X');
+        if(getBoard(x) != 'X' && getBoard(x) != 'O' && !gameOver()){
+            if(flop){
+                setBoard(x, 'X');
+            }
+            else{
+                setBoard(x, 'O');
+            }
+            flop = !flop;
             displayController.update();
+            gameOver();
+        }
+        else if(gameOver()){
+            console.log("Winner already Delcared");
         }
         else{
             console.log("Invalid Location");
         }
        };
     };
-    return {getBoard, setBoard, reset, playerAddMarks};
+    const gameOver = () => {
+        let valid = 0;
+        let current = '';
+        //Check horizontal
+        for(i =0; i <3; i++){
+            current = getBoard(i*3);
+            if(current == "X" || current == "O"){
+                valid = 1;
+                for (let j = 1; j < 3; j++) {
+                    if(current == getBoard((i*3) +j)){
+                        valid++;
+                    }
+                    else break;
+                }
+            }
+            if(valid == 3)break;
+        }
+        //Check vertical
+        if(valid !=3){
+            for(i =0; i <3; i++){
+                current = getBoard(i);
+                if(current == "X" || current == "O"){
+                    valid = 1;
+                    for (let j = 1; j < 3; j++) {
+                        if(current == getBoard(i +(j*3))){
+                            valid++;
+                        }
+                        else break;
+                    }
+                }
+                if(valid == 3)break;
+            }
+        }
+        //Check Diagonal
+        if(valid !=3){
+            current = getBoard(0);
+            if(current == "X" || current == "O"){
+                if(current == getBoard(4) && current == getBoard(8)){
+                    valid =3;
+                }
+            }
+            if(valid !=3){
+                current = getBoard(2);
+                if(current == "X" || current == "O"){
+                    if(current == getBoard(4) && current == getBoard(6)){
+                        valid =3;
+                    }
+                }
+            }
+        }
+        //check if tie
+        if(valid == 3){
+            console.log(`Winner ${current}`);
+            return true;
+        }
+        else{
+            for (let i = 0; i < 9; i++) {
+                if(getBoard(i) != "X" && getBoard(i) != "O"){
+                    return false;
+                }
+            }
+            console.log("tied");
+            return true;
+        }
+    };
+    return {getBoard, setBoard, reset, playerAddMarks, gameOver};
 })();
 const displayController = (() =>{
     const board = document.getElementById('gameBoard');
