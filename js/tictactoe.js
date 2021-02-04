@@ -16,8 +16,8 @@ const gameBoard = (() =>{
     }
     const playerAddMarks = (x) =>{
        return function (){
-        gamestate = gameOver();
-        if(getBoard(x) != 'X' && getBoard(x) != 'O' && gamestate == ''){
+        gamestate = gameOver(board);
+        if(getBoard(x) != 'X' && getBoard(x) != 'O' && gamestate == null){
             if(flop){
                 setBoard(x, player1.getPiece());
             }
@@ -26,34 +26,37 @@ const gameBoard = (() =>{
             }
             flop = !flop;
             displayController.update();
-            gamestate = gameOver();
-            if(gamestate != ''){
-                displayController.showWinner(gamestate);
+            gamestate = gameOver(board);
+            if(gamestate != null){
+                displayController.showWinner(score(gamestate));
             }
             validChoice.splice(validChoice.indexOf(x), 1);
             console.log(validChoice);
         }
-        else if(gamestate == ''){
+        else if(gamestate == null){
                 console.log("Invalid Location");
             }
         else console.log('Winner already declared');
-        if(aiLevel >0 && !flop && gamestate == ''){
+        if(aiLevel >0 && !flop && gamestate == null){
             if(aiLevel == 1){
                 ranAi();
+            }
+            else if(aiLevel ==2){
+                hardAi(false);
             }
         }
        };
     };
-    const gameOver = () => {
+    const gameOver = (tempBoard) => {
         let valid = 0;
         let current = '';
         //Check horizontal
         for(i =0; i <3; i++){
-            current = getBoard(i*3);
+            current = tempBoard[i*3];
             if(current == "X" || current == "O"){
                 valid = 1;
                 for (let j = 1; j < 3; j++) {
-                    if(current == getBoard((i*3) +j)){
+                    if(current == tempBoard[(i*3) +j]){
                         valid++;
                     }
                     else break;
@@ -64,11 +67,11 @@ const gameBoard = (() =>{
         //Check vertical
         if(valid !=3){
             for(i =0; i <3; i++){
-                current = getBoard(i);
+                current = tempBoard[i];
                 if(current == "X" || current == "O"){
                     valid = 1;
                     for (let j = 1; j < 3; j++) {
-                        if(current == getBoard(i +(j*3))){
+                        if(current == tempBoard[i +(j*3)]){
                             valid++;
                         }
                         else break;
@@ -79,16 +82,16 @@ const gameBoard = (() =>{
         }
         //Check Diagonal
         if(valid !=3){
-            current = getBoard(0);
+            current = tempBoard[0];
             if(current == "X" || current == "O"){
-                if(current == getBoard(4) && current == getBoard(8)){
+                if(current == tempBoard[4] && current == tempBoard[8]){
                     valid =3;
                 }
             }
             if(valid !=3){
-                current = getBoard(2);
+                current = tempBoard[2];
                 if(current == "X" || current == "O"){
-                    if(current == getBoard(4) && current == getBoard(6)){
+                    if(current == tempBoard[4] && current == tempBoard[6]){
                         valid =3;
                     }
                 }
@@ -96,16 +99,16 @@ const gameBoard = (() =>{
         }
         //check if tie
         if(valid == 3){
-            if(player1.getPiece() == current) return `${player1.getName()} Won!`;
-            else return `${player2.getName()} Won!`;
+            if(player1.getPiece() == current) return 1;
+            else return -1;
         }
         else{
             for (let i = 0; i < 9; i++) {
-                if(getBoard(i) != "X" && getBoard(i) != "O"){
-                    return '';
+                if(tempBoard[i] != "X" && tempBoard[i] != "O"){
+                    return null;
                 }
             }
-            return "You Tied!";
+            return 0;
         }
     };
     const createPlayers = (name1, piece1, name2, piece2, aiLvl) => {
@@ -114,8 +117,12 @@ const gameBoard = (() =>{
         flop = piece1 == 'X';
         aiLevel = aiLvl;
         if(aiLevel >0 && !flop){
-            console.log('hit');
-            ranAi();
+            if(aiLevel ==1){
+                ranAi();
+            }
+            else{
+                hardAi(false);
+            }
         }
     }
     const ranAi = () =>{
@@ -124,7 +131,61 @@ const gameBoard = (() =>{
         let aimove =playerAddMarks(move);
         aimove();
     }
-    return {getBoard, setBoard, reset, playerAddMarks, gameOver, createPlayers};
+    const hardAi = (pieceFlop) =>{
+        console.log(`Flop is ${pieceFlop}`);
+        let aiBoard = [...board];
+        let bestMove = -1;
+        let bestScore = pieceFlop ? -Infinity : Infinity;
+        for (let i = 0; i < 9; i++) {
+            if(aiBoard[i] == null){
+                console.log(aiBoard);
+                aiBoard[i] = player2.getPiece();
+                console.log(aiBoard);
+                let currentScore = minMax(aiBoard, 0, !pieceFlop);
+                if(pieceFlop && currentScore > bestScore) {
+                    bestScore = currentScore;
+                    bestMove = i;
+                }else if(!pieceFlop && currentScore < bestScore){
+                    bestScore = currentScore;
+                    bestMove = i;
+                }
+                aiBoard[i] = null;
+            }
+        }
+        let aimove =playerAddMarks(bestMove);
+        aimove();
+    }
+    const minMax = (tempBoard,depth, isMaximizing) =>{
+        let gamestate = gameOver(tempBoard);
+        let bestVal = isMaximizing ? -Infinity : Infinity;
+        if( gamestate != null){
+            return gamestate;
+        }
+        if(isMaximizing){
+            for (let i = 0; i < 9; i++) {
+                if(tempBoard[i] == null){
+                    tempBoard[i] = 'X';
+                    bestVal = Math.max(bestVal, minMax(tempBoard, depth+1, !isMaximizing));
+                    tempBoard[i] = null;
+                }
+            }
+            return bestVal;
+        }
+        else{
+            for (let i = 0; i < 9; i++) {
+                if(tempBoard[i] == null){
+                    tempBoard[i] = 'O';
+                    bestVal = Math.min(bestVal, minMax(tempBoard, depth+1, !isMaximizing));
+                    tempBoard[i] = null;
+                }
+            }
+            return bestVal;
+        }
+    }
+    const score = (x) =>{
+        return x ==0 ? 'You Tied': x == 1 ? `${player1.getName()} Won!` : `${player2.getName()} Won!`;
+    };
+    return {getBoard, setBoard, reset, playerAddMarks, createPlayers};
 })();
 const displayController = (() =>{
     const board = document.getElementById('gameBoard');
