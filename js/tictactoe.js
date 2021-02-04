@@ -113,7 +113,6 @@ const displayController = (() =>{
         }
         for(i =0; i< 9; i++){
             let cell = document.createElement("div");
-            cell.style.backgroundColor = '#ffffff';
             if(gameBoard.getBoard(i) == 'X' || gameBoard.getBoard(i) == 'O'){
                 cell.innerText = gameBoard.getBoard(i);
             }
