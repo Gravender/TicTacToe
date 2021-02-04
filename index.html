@@ -11,7 +11,15 @@
   <h1>Tic Tac Toe</h1>
   <div class = 'start' id= 'start'>
     <p><label for="player1">Player 1 Name:</label><input class = 'playerInput' id="player1" type="text" placeholder="Enter a name?"></p>
+    <input type="radio" id="xMark" name="Mark" value="X" checked>
+    <label for="xMark">X</label>
+    <input type="radio" id="oMark" name="Mark" value="O">
+    <label for="oMark">O</label>
     <p><label for="player2">Player 2 Name:</label><input class = 'playerInput' id="player2" type="text" placeholder="Enter a name?"></p>
+    <input type="radio" id="pOpponet" name="opponent" value="0" checked>
+    <label for="pOpponet">Player</label>
+    <input type="radio" id="aiOpponet" name="opponent" value="1">
+    <label for="aiOpponet">Easy Ai</label><br>
     <button id= 'startBtn' >StartGame</button>
   </div>
   <div class = 'gameBoard' id ='gameBoard'></div>
